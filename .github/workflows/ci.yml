@@ -1,0 +1,50 @@
+name: Android Testers CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Contract and content checks
+        run: npm test
+      - name: TypeScript check
+        run: npm run typecheck
+      - name: Production build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_SITE_URL: https://android12testers.com
+          NEON_AUTH_BASE_URL: https://example.neon.tech/neondb/auth
+          NEXT_PUBLIC_NEON_AUTH_URL: https://example.neon.tech/neondb/auth
+          NEON_AUTH_COOKIE_SECRET: ci-only-secret-not-used-for-live-auth-0123456789
+          BACKEND_API_URL: https://example.onrender.com
+          BACKEND_PROXY_SECRET: ci-only-proxy-secret-not-used-in-production-0123456789
+
+  backend:
+    name: Rust backend checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+      - name: Cargo check
+        run: cargo check --manifest-path backend/Cargo.toml
+      - name: Cargo tests
+        run: cargo test --manifest-path backend/Cargo.toml

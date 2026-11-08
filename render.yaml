@@ -1,0 +1,37 @@
+services:
+  - type: web
+    name: android-testers-api
+    runtime: docker
+    region: ohio
+    rootDir: backend
+    dockerfilePath: Dockerfile
+    dockerContext: .
+    plan: 0.5c-512mb
+    healthCheckPath: /healthz
+    maxShutdownDelaySeconds: 60
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: DATABASE_URL
+        sync: false
+      - key: BACKEND_PROXY_SECRET
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: PAYSTACK_WEBHOOK_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://android12testers.com
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET_NAME
+        value: android-testers-evidence
+      - key: RESEND_FROM_EMAIL
+        value: "Android Testers <notifications@android12testers.com>"
+      - key: RUST_LOG
+        value: android_testers_api=info,tower_http=info
