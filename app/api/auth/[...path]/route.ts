@@ -3,10 +3,7 @@ import { getAuth } from "@/lib/auth/server";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
-  return getAuth().handler().GET(request as never);
-}
+const authHandler = getAuth().handler();
 
-export async function POST(request: Request) {
-  return getAuth().handler().POST(request as never);
-}
+export const GET = authHandler.GET;
+export const POST = authHandler.POST;
